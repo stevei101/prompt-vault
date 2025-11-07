@@ -47,7 +47,7 @@ EOF
 bun run dev
 ```
 
-Visit `http://localhost:5173` and sign in with Google!
+Visit `http://localhost:5175` and sign in with Google!
 
 ## 3. Deploy to Cloud Run (Automatic)
 

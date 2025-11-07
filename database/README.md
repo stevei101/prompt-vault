@@ -20,7 +20,7 @@ This directory contains the database schema for Prompt Vault, which uses Supabas
    - Add your Google OAuth Client ID and Client Secret
    - Add authorized redirect URLs:
      - `https://{your-project-ref}.supabase.co/auth/v1/callback`
-     - For local development: `http://localhost:5173`
+     - For local development: `http://localhost:5175`
 
 4. **Get Your API Keys**
    - Go to **Settings** → **API**

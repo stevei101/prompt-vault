@@ -60,7 +60,7 @@ cd frontend
 bun run dev
 ```
 
-Visit <http://localhost:5173> and sign in using your Supabase Google OAuth
+Visit <http://localhost:5175> and sign in using your Supabase Google OAuth
 configuration.
 
 ### 4. Useful Commands
