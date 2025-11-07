@@ -88,6 +88,13 @@ GitHub Actions integration mirrors the standard pattern across the organisation
 by consuming the reusable workflows in `stevei101/infrastructure`. See
 `.github/workflows/` in this repo once initial pipelines are wired up.
 
+## Related Projects
+
+- [`stevei101/cursor-ide`](https://github.com/stevei101/cursor-ide) – utility
+  for managing Cursor prompt libraries. Use
+  [`PROMPT_VAULT_INTEGRATION.md`](https://github.com/stevei101/cursor-ide/blob/main/PROMPT_VAULT_INTEGRATION.md)
+  to sync Cursor prompts into Prompt Vault.
+
 ## Integration with Agent Apps
 
 Agent applications consume Prompt Vault via Supabase APIs and the helper in

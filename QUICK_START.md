@@ -77,6 +77,8 @@ Once you push to the `main` or `main-promptvault` branch:
 - 🔍 Search and organize prompts
 - 📝 Edit and refine prompts
 - 🌐 Share public prompts
+- ⛅ Import your Cursor IDE library with
+  [cursor-ide](https://github.com/stevei101/cursor-ide)
 
 ## Troubleshooting
 
