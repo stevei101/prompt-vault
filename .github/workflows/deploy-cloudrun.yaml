@@ -23,7 +23,7 @@ env:
 jobs:
   deploy:
     name: Deploy
-    uses: stevei101/podman-cloudrun-deploy-gha/.github/workflows/podman-cloudrun-deploy.yaml@v0.1.0
+    uses: stevei101/podman-cloudrun-deploy-gha/.github/workflows/podman-cloudrun-deploy.yaml@v0.2.0
     with:
       environment: ${{ env.DEPLOY_ENV }}
       service_name: ${{ env.SERVICE_NAME }}
