@@ -77,7 +77,7 @@ Ensure the Supabase anon key secret exists in Secret Manager with ID `SUPABASE_A
 
 ## 4. Workflow behaviour
 
-`.github/workflows/deploy-cloudrun.yaml` invokes the reusable workflow `podman-cloudrun-deploy-gha@v0.1.0`. The pipeline performs:
+`.github/workflows/deploy-cloudrun.yaml` invokes the reusable workflow `podman-cloudrun-deploy-gha@v0.2.0`. The pipeline performs:
 
 1. (Optional) Terraform init + apply in `infrastructure/terraform`
 2. Build the container image with Podman

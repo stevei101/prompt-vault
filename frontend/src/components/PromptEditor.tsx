@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { PromptInsert, PromptUpdate } from '../types/database';
+import { Prompt, PromptInsert, PromptUpdate } from '../types/database';
 import { Save, ArrowLeft } from 'lucide-react';
 
 export default function PromptEditor() {
@@ -21,13 +21,10 @@ export default function PromptEditor() {
     is_public: false,
   });
 
-  useEffect(() => {
-    if (id) {
-      loadPrompt(id);
-    }
-  }, [id]);
+  const handleErrorMessage = (err: unknown): string =>
+    err instanceof Error ? err.message : 'Unknown error';
 
-  const loadPrompt = async (promptId: string) => {
+  const loadPrompt = useCallback(async (promptId: string) => {
     try {
       const {
         data: { user },
@@ -44,23 +41,30 @@ export default function PromptEditor() {
       if (error) throw error;
 
       if (data) {
+        const promptData = data as Prompt;
         setPrompt({
-          title: data.title || '',
-          content: data.content || '',
-          description: data.description || '',
-          category: data.category || '',
-          tags: data.tags || [],
-          is_public: data.is_public || false,
+          title: promptData.title || '',
+          content: promptData.content || '',
+          description: promptData.description || '',
+          category: promptData.category || '',
+          tags: promptData.tags || [],
+          is_public: promptData.is_public || false,
         });
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error loading prompt:', error);
-      setError('Failed to load prompt: ' + (error.message || 'Unknown error'));
+      setError('Failed to load prompt: ' + handleErrorMessage(error));
       navigate('/prompts');
     } finally {
       setLoading(false);
     }
-  };
+  }, [navigate]);
+
+  useEffect(() => {
+    if (id) {
+      void loadPrompt(id);
+    }
+  }, [id, loadPrompt]);
 
   const handleSave = async () => {
     if (!prompt.title.trim() || !prompt.content.trim()) {
@@ -97,9 +101,9 @@ export default function PromptEditor() {
         if (error) throw error;
         navigate('/prompts');
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error saving prompt:', error);
-      setError('Failed to save prompt: ' + (error.message || 'Unknown error'));
+      setError('Failed to save prompt: ' + handleErrorMessage(error));
     } finally {
       setSaving(false);
     }

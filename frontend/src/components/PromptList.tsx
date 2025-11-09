@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { Prompt } from '../types/database';
@@ -25,11 +25,10 @@ export default function PromptList() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
-  useEffect(() => {
-    loadPrompts();
-  }, []);
+  const handleErrorMessage = (err: unknown): string =>
+    err instanceof Error ? err.message : 'Unknown error';
 
-  const loadPrompts = async () => {
+  const loadPrompts = useCallback(async () => {
     try {
       const {
         data: { user },
@@ -43,35 +42,43 @@ export default function PromptList() {
         .order('updated_at', { ascending: false });
 
       if (error) throw error;
-      setPrompts(data || []);
-    } catch (error: any) {
+      setPrompts((data as Prompt[]) ?? []);
+    } catch (error) {
       console.error('Error loading prompts:', error);
-      setError('Failed to load prompts: ' + (error.message || 'Unknown error'));
+      setError('Failed to load prompts: ' + handleErrorMessage(error));
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    void loadPrompts();
+  }, [loadPrompts]);
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this prompt?')) return;
+    if (!window.confirm('Are you sure you want to delete this prompt?')) return;
 
     try {
       const { error } = await supabase.from('prompts').delete().eq('id', id);
 
       if (error) throw error;
-      loadPrompts();
-    } catch (error: any) {
+      void loadPrompts();
+    } catch (error) {
       console.error('Error deleting prompt:', error);
-      setError(
-        'Failed to delete prompt: ' + (error.message || 'Unknown error')
-      );
+      setError('Failed to delete prompt: ' + handleErrorMessage(error));
     }
   };
 
   // Get unique categories for filter
   const categories = Array.from(
-    new Set(prompts.map(p => p.category).filter(Boolean))
-  ) as string[];
+    new Set(
+      prompts
+        .map(prompt => prompt.category)
+        .filter((category): category is string =>
+          typeof category === 'string' && category.trim().length > 0
+        )
+    )
+  );
 
   const filteredPrompts = prompts.filter(prompt => {
     const matchesSearch =
