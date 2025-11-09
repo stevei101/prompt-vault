@@ -80,9 +80,10 @@ Ensure the Supabase anon key secret exists in Secret Manager with ID `SUPABASE_A
 `.github/workflows/deploy-cloudrun.yaml` invokes the reusable workflow `podman-cloudrun-deploy-gha@v0.2.0`. The pipeline performs:
 
 1. (Optional) Terraform init + apply in `infrastructure/terraform`
-2. Build the container image with Podman
-3. Push the image to Artifact Registry
-4. Deploy Prompt Vault to Cloud Run, injecting:
+2. Run frontend quality gates via Bun (`bun install`, `bun run lint`, `bun run type-check`, `bun run test -- --run`)
+3. Build the container image with Podman
+4. Push the image to Artifact Registry
+5. Deploy Prompt Vault to Cloud Run, injecting:
    - `SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_GOOGLE_CLIENT_ID`
    - `NEXT_PUBLIC_GITHUB_CLIENT_ID`
