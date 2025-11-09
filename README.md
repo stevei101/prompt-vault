@@ -43,7 +43,7 @@ Follow [`database/README.md`](./database/README.md) to
 
 - create the project,
 - run the SQL schema, and
-- enable Google OAuth.
+- enable Google **and GitHub** OAuth providers in Supabase.
 
 Create `frontend/.env.local` with:
 
@@ -51,6 +51,7 @@ Create `frontend/.env.local` with:
 VITE_SUPABASE_URL=https://your-project-ref.supabase.co
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 VITE_GOOGLE_CLIENT_ID=your_google_client_id
+VITE_GITHUB_CLIENT_ID=your_github_client_id
 ```
 
 ### 3. Run the App Locally
@@ -60,8 +61,8 @@ cd frontend
 bun run dev
 ```
 
-Visit <http://localhost:5175> and sign in using your Supabase Google OAuth
-configuration.
+Visit <http://localhost:5175> and sign in using your Supabase Google or GitHub
+OAuth configuration.
 
 ### 4. Useful Commands
 
@@ -85,8 +86,10 @@ docker build -t prompt-vault-frontend -f Dockerfile .
 ```
 
 GitHub Actions integration mirrors the standard pattern across the organisation
-by consuming the reusable workflows in `stevei101/infrastructure`. See
-`.github/workflows/` in this repo once initial pipelines are wired up.
+by consuming the reusable workflows in
+[`stevei101/podman-cloudrun-deploy-gha`](https://github.com/stevei101/podman-cloudrun-deploy-gha).
+See [Cloud Run Deployment Guide](./docs/CLOUD_RUN_DEPLOYMENT.md) for the CI/CD
+setup, Terraform configuration, and required secrets.
 
 ## Related Projects
 

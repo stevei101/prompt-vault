@@ -1,0 +1,7 @@
+project_id                     = "my-gcp-project"
+region                         = "us-central1"
+artifact_registry_repository_id = "prompt-vault"
+artifact_registry_location     = "us-central1"
+supabase_anon_secret_id        = "SUPABASE_ANON_KEY"
+runtime_service_account_email  = ""
+gha_service_account_email      = "gha-prompt-vault@my-gcp-project.iam.gserviceaccount.com"

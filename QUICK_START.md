@@ -13,10 +13,10 @@ Get Prompt Vault up and running in 5 minutes!
    - Copy contents of `database/schema.sql`
    - Click **Run**
 
-3. **Configure Google OAuth**
-   - Go to **Authentication** → **Providers** → **Google**
-   - Enable Google provider
-   - Add your Google OAuth credentials
+3. **Configure OAuth Providers**
+   - Go to **Authentication** → **Providers**
+   - Enable **Google** and **GitHub**
+   - Add the OAuth client IDs and secrets generated in Google Cloud Console and GitHub Developer settings
    - Add redirect URL: `https://{project-ref}.supabase.co/auth/v1/callback`
 
 4. **Get API Keys**
@@ -38,6 +38,7 @@ cat > .env.local << EOF
 VITE_SUPABASE_URL=https://your-project-ref.supabase.co
 VITE_SUPABASE_ANON_KEY=your_publishable_key_here
 VITE_GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
+VITE_GITHUB_CLIENT_ID=your-github-client-id
 EOF
 
 # Note: You only need the Google OAuth Client ID, NOT the Client Secret!
@@ -47,29 +48,23 @@ EOF
 bun run dev
 ```
 
-Visit `http://localhost:5175` and sign in with Google!
+Visit `http://localhost:5175` and sign in with Google or GitHub!
 
 ## 3. Deploy to Cloud Run (Automatic)
 
-Once you push to the `main` or `main-promptvault` branch:
+Once you push to the `main` branch the **Deploy Prompt Vault to Cloud Run** workflow will:
 
-1. **GitHub Actions** will automatically:
-   - Build the container image
-   - Push to Google Artifact Registry
-   - Deploy to Cloud Run
+1. Run `terraform apply` in `infrastructure/terraform` (using Terraform Cloud)
+2. Build the container with Podman and push it to Artifact Registry
+3. Deploy to Cloud Run with Supabase configuration injected from repository variables and Secret Manager
 
-2. **Set up Secrets in GCP Secret Manager:**
+Before running the workflow, follow the [Cloud Run Deployment Guide](./docs/CLOUD_RUN_DEPLOYMENT.md) to:
 
-   ```bash
-   # Add Supabase secrets
-   echo -n "https://your-project-ref.supabase.co" | gcloud secrets create SUPABASE_URL --data-file=-
-   echo -n "your_publishable_key" | gcloud secrets create SUPABASE_ANON_KEY --data-file=-
-   echo -n "your_google_client_id" | gcloud secrets create GOOGLE_OAUTH_CLIENT_ID --data-file=-
-   ```
+- Configure GitHub repository secrets/variables
+- Add the Supabase anon key to Secret Manager (`SUPABASE_ANON_KEY`)
+- Provision the supporting infrastructure via Terraform
 
-3. **Access your deployed app:**
-   - Frontend URL will be shown in GitHub Actions summary
-   - Or find it in Cloud Run console
+After the workflow completes, the Cloud Run service URL appears in the job summary (and in the Cloud Run console).
 
 ## What's Next?
 

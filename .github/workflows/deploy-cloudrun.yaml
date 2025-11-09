@@ -1,0 +1,45 @@
+name: Deploy Prompt Vault to Cloud Run
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-prompt-vault-${{ github.ref_name }}
+  cancel-in-progress: true
+
+env:
+  SERVICE_NAME: ${{ vars.CLOUD_RUN_SERVICE_NAME }}
+  REGION: ${{ vars.CLOUD_RUN_REGION }}
+  GAR_REPOSITORY: ${{ vars.GAR_REPOSITORY }}
+  SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+  GOOGLE_CLIENT_ID: ${{ vars.GOOGLE_OAUTH_CLIENT_ID }}
+  GITHUB_CLIENT_ID: ${{ vars.GITHUB_OAUTH_CLIENT_ID }}
+  TERRAFORM_DIR: infrastructure/terraform
+  DEPLOY_ENV: ${{ (vars.DEPLOY_ENV != '' && vars.DEPLOY_ENV) || 'staging' }}
+  TERRAFORM_WORKSPACE: prompt-vault-${{ (vars.DEPLOY_ENV != '' && vars.DEPLOY_ENV) || 'staging' }}
+
+jobs:
+  deploy:
+    name: Deploy
+    uses: stevei101/podman-cloudrun-deploy-gha/.github/workflows/podman-cloudrun-deploy.yaml@v0.1.0
+    with:
+      environment: ${{ env.DEPLOY_ENV }}
+      service_name: ${{ env.SERVICE_NAME }}
+      cloud_run_region: ${{ env.REGION }}
+      gar_repository: ${{ env.GAR_REPOSITORY }}
+      dockerfile: Dockerfile
+      build_context: .
+      image_tag: ${{ github.sha }}
+      container_port: "8080"
+      allow_unauthenticated: false
+      additional_env_vars: SUPABASE_URL=${{ env.SUPABASE_URL }},NEXT_PUBLIC_SUPABASE_URL=${{ env.SUPABASE_URL }},NEXT_PUBLIC_GOOGLE_CLIENT_ID=${{ env.GOOGLE_CLIENT_ID }},NEXT_PUBLIC_GITHUB_CLIENT_ID=${{ env.GITHUB_CLIENT_ID }}
+      additional_secrets: SUPABASE_ANON_KEY=SUPABASE_ANON_KEY:latest,NEXT_PUBLIC_SUPABASE_ANON_KEY=SUPABASE_ANON_KEY:latest
+      terraform_directory: ${{ env.TERRAFORM_DIR }}
+      terraform_workspace: ${{ env.TERRAFORM_WORKSPACE }}
+    secrets:
+      GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+      WIF_PROVIDER: ${{ secrets.WIF_PROVIDER }}
+      WIF_SERVICE_ACCOUNT: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+      TF_API_TOKEN: ${{ secrets.TF_API_TOKEN }}

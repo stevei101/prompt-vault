@@ -1,23 +1,34 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Get Supabase credentials from window (injected at runtime by Dockerfile)
-// or from environment variables (for local development)
-const getSupabaseUrl = (): string => {
-  if (typeof window !== 'undefined' && (window as any).SUPABASE_URL) {
-    return (window as any).SUPABASE_URL;
-  }
-  return import.meta.env.VITE_SUPABASE_URL || '';
+type SupabaseRuntimeConfig = {
+  SUPABASE_URL?: string;
+  SUPABASE_ANON_KEY?: string;
 };
 
-const getSupabaseAnonKey = (): string => {
-  if (typeof window !== 'undefined' && (window as any).SUPABASE_ANON_KEY) {
-    return (window as any).SUPABASE_ANON_KEY;
+const readRuntimeConfig = <
+  Key extends keyof SupabaseRuntimeConfig,
+  EnvKey extends 'VITE_SUPABASE_URL' | 'VITE_SUPABASE_ANON_KEY',
+>(
+  key: Key,
+  envKey: EnvKey
+): string => {
+  if (typeof window !== 'undefined') {
+    const runtime = window as Window & SupabaseRuntimeConfig;
+    const value = runtime[key];
+    if (typeof value === 'string' && value.trim().length > 0) {
+      return value;
+    }
   }
-  return import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+
+  const envValue = import.meta.env[envKey];
+  return typeof envValue === 'string' ? envValue : '';
 };
 
-const supabaseUrl = getSupabaseUrl();
-const supabaseAnonKey = getSupabaseAnonKey();
+const supabaseUrl = readRuntimeConfig('SUPABASE_URL', 'VITE_SUPABASE_URL');
+const supabaseAnonKey = readRuntimeConfig(
+  'SUPABASE_ANON_KEY',
+  'VITE_SUPABASE_ANON_KEY'
+);
 
 // Fail fast if credentials are missing - prevents silent failures and security issues
 if (!supabaseUrl || !supabaseAnonKey) {
@@ -31,7 +42,12 @@ if (!supabaseUrl || !supabaseAnonKey) {
   }
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+export const supabaseConfig = {
+  url: supabaseUrl,
+  anonKey: supabaseAnonKey,
+};
+
+export const supabase = createClient(supabaseConfig.url, supabaseConfig.anonKey, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
